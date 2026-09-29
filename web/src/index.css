@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* caliper is a dark app: the 3D viewport wants a dark surround, so the whole
+   UI commits to one dark theme rather than tracking the OS. The tokens below are
+   the old hand-rolled palette (bg #0b0f17, panel #131a26, line #223049, accent
+   #3b82f6, …) expressed as shadcn HSL variables. */
+@layer base {
+  :root {
+    --background: 222 41% 6%;
+    --foreground: 213 40% 93%;
+
+    --card: 218 33% 11%;
+    --card-foreground: 213 40% 93%;
+
+    --popover: 218 33% 12%;
+    --popover-foreground: 213 40% 93%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 218 30% 16%;
+    --secondary-foreground: 213 40% 93%;
+
+    --muted: 218 30% 15%;
+    --muted-foreground: 215 22% 62%;
+
+    --accent: 218 32% 18%;
+    --accent-foreground: 213 40% 96%;
+
+    --destructive: 3 92% 63%;
+    --destructive-foreground: 0 0% 100%;
+
+    --good: 142 71% 45%;
+    --warn: 41 74% 49%;
+
+    --border: 218 36% 21%;
+    --input: 218 36% 21%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  /* Global type scale. Tailwind's text-* and spacing utilities are rem-based,
+     so shrinking the root shrinks the whole UI proportionally — more fits on
+     screen. Browser default is 16px; 14px is an ~88% zoom-out. */
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    overflow: hidden;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+}
+
+/* The dock's code layers: a highlighted <pre> and a transparent <textarea>
+   share these exact metrics so the caret lines up with the coloured text. */
+.code-layer {
+  margin: 0;
+  tab-size: 4;
+}
+.code-layer.highlight {
+  color: hsl(var(--foreground));
+}
+.code-layer.doc .add {
+  color: hsl(var(--good));
+}
+.code-layer.doc .del {
+  color: hsl(var(--destructive));
+}
+.code-layer.doc .hunk {
+  color: hsl(var(--primary));
+}
+.code-layer.doc .meta {
+  color: hsl(var(--muted-foreground));
+}
+.c-comment {
+  color: #6b7f9e;
+  font-style: italic;
+}
+.c-string {
+  color: #7fd1a0;
+}
+.c-key {
+  color: #7aa2f7;
+}
+.c-num {
+  color: #e0a458;
+}
+.c-fn {
+  color: #c4a7ea;
+}
+
+/* The .art grid editor: one <span> per cell, sized off the --cell variable the
+   component sets so zoom is a single property. A faint inset outline draws the
+   grid; a hover tint shows where a paint would land. */
+.art-grid {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  cursor: crosshair;
+  user-select: none;
+  color: hsl(var(--foreground));
+}
+.art-cell {
+  display: inline-block;
+  width: var(--cell);
+  height: var(--cell);
+  line-height: var(--cell);
+  text-align: center;
+  white-space: pre;
+  box-shadow: inset 0 0 0 0.5px hsl(var(--border) / 0.35);
+}
+/* A ring, not a background — an inline fill on a painted cell would win over a
+   hover background, but this shows on filled and empty cells alike. */
+.art-cell:hover {
+  box-shadow: inset 0 0 0 1px hsl(var(--primary));
+}
+
+/* The review prototype uses the same surfaces and controls as the workbench. */
+.prototype-grid { grid-template-columns: 220px minmax(240px, 1fr) 270px; }
+.prototype-grid.with-sessions { grid-template-columns: 220px minmax(240px, 1fr) 260px 290px; }
+@media (max-width: 1200px) {
+  .prototype-grid.with-sessions { grid-template-columns: 190px minmax(230px, 1fr) 250px; overflow-y: auto; }
+  .prototype-sessions { grid-column: 1 / -1; min-height: 320px; border-top: 1px solid hsl(var(--border)); }
+}
+@media (max-width: 760px) {
+  .prototype-grid, .prototype-grid.with-sessions { grid-template-columns: 150px minmax(180px, 1fr); overflow-y: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Float narrow-screen panels over the model without remounting live sessions. */
+.compact-project .workspace-project-handle,
+.compact-agents .workspace-agent-handle { display: none; }
+.compact-project #project-panel,
+.compact-agents #agent-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 40;
+  flex: none !important;
+  width: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+.compact-project #project-panel { left: 0; }
+.compact-agents #agent-panel { right: 0; }
+.project-overlay-open.compact-project #project-panel {
+  width: min(280px, 100%) !important;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 12px 0 35px hsl(var(--background) / .6);
+}
+.agents-overlay-open.compact-agents #agent-panel {
+  width: min(380px, 100%) !important;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: -12px 0 35px hsl(var(--background) / .6);
+}

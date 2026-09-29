@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""The one command for working on a design.
+
+The toolchain lives in the image and the model lives in a workspace, so every
+tool needs to be told which workspace it is looking at. This wrapper does that
+once: it finds the workspace root (`$WORKSPACE`, else the nearest folder at or
+above the cwd holding `cad/`), exports it to the child, and runs the tool with
+the right interpreter.
+
+    caliper help          what each command is for
+    caliper export        rebuild out/ from cad/
+    caliper sim -s 8      does it stand up and go somewhere?
+
+Everything after the command name is passed straight through, so the tools'
+own `--flags` work unchanged.
+"""
+
+from __future__ import annotations
+
+import os
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+APP = Path(os.environ.get("APP_DIR") or Path(__file__).resolve().parent.parent)
+TOOLS = APP / "tools"
+
+# name -> (kind, target, one-line purpose). `cad` runs the workspace's own copy
+# (the model owns its exporter); `tool` and `node` run the image's.
+COMMANDS: dict[str, tuple[str, str, str]] = {
+    "export":   ("cad",  "export.py",     "rebuild out/ from cad/ — run after every edit"),
+    "watch":    ("cad",  "watch.py",      "re-export on every save (butai runs this for you)"),
+    "render":   ("tool", "render.py",     "look at it: PNGs you can read — aim the camera, cut, pose"),
+    "draft":    ("tool", "draft.py",      "three-view line drawing: ASCII to read, --svg to keep"),
+    "fitcheck": ("tool", "fitcheck.py",   "measure the assembly: clashes, gaps, ±Y symmetry"),
+    "rom":      ("tool", "rom.py",        "how far each joint can actually move before it hits"),
+    "sim":      ("node", "simcheck.mjs",  "run the physics headless: does it stand, does it walk"),
+    "clash":    ("tool", "clash.py",      "pairwise solid overlap, in mm³"),
+    "collide":  ("tool", "collide.py",    "clearance sweep through the range of motion"),
+    "print":    ("tool", "printparts.py", "write out/print/*.stl and the manifest"),
+    "bundle":   ("tool", "bundle.py",     "STEP/STL/3MF/OBJ of the whole design, into out/export/"),
+    "bom":      ("tool", "bomcmd.py",     "what to buy, counted from the model"),
+    "parts":    ("tool", "partscmd.py",   "the shared catalogue: browse it, search it by fit"),
+    "sub":      ("tool", "subcmd.py",     "include another design here, as a git submodule"),
+    "scenes":   ("tool", "scenescmd.py",  "list the named scenes and configurations in a project"),
+    "project":  ("tool", "projectcmd.py", "build scenes and isolated subcomponent previews"),
+}
+
+USAGE = """caliper — build and check one design
+
+  caliper export                     rebuild out/ from cad/
+  caliper watch                      re-export on every save
+  caliper render [--section 'y>142'] orthographic PNGs into out/views/
+  caliper render --focus NAME --persp  one part, close up, in perspective
+  caliper render --eye X,Y,Z [--target X,Y,Z] | --azim D --elev D | --view around
+  caliper draft  [--svg|--out f.art] three-view drawing: ASCII, an editable .art grid, or SVG
+  caliper fitcheck                   clashes, gaps and symmetry, in mm
+  caliper rom [--joint 'fl_*']       collision-free travel per joint
+  caliper sim [--seconds 8]          headless physics: stands? walks?
+  caliper clash | collide | print    overlap · clearance sweep · printable STLs
+  caliper bundle [--formats stl,3mf] hand it to another program: out/export/
+  caliper bom [--check|--geometry]   bought hardware, counted from the model
+  caliper parts [--fits 8] [QUERY]   the shared catalogue of real parts
+  caliper sub add|list|status|update include another design, pinned at a commit
+  caliper scenes                    named scenes from cad/project.json
+  caliper export --scene NAME --set KEY=JSON   build a scene configuration
+
+The loop: edit cad/, `caliper export`, then measure with fitcheck/rom before
+believing it. `caliper render` is how you see it — there is no browser here, but
+the PNGs it writes are images you can open and read. `caliper sim` only means
+anything once the design has joints.
+
+Workspace: {root}
+"""
+
+
+def find_root() -> Path:
+    """Same rule as tools/paths.py, duplicated so the CLI needs no imports."""
+    env = os.environ.get("WORKSPACE")
+    if env:
+        return Path(env).resolve()
+    here = Path.cwd().resolve()
+    for cand in (here, *here.parents):
+        if (cand / "cad").is_dir():
+            return cand
+    return APP
+
+
+def python() -> str:
+    """The interpreter that has build123d: the image's venv, else a local one."""
+    for cand in (os.environ.get("CAD_PYTHON"), "/opt/venv/bin/python", str(APP / ".venv/bin/python")):
+        if cand and Path(cand).exists():
+            return cand
+    return sys.executable
+
+
+def main(argv: list[str]) -> int:
+    root = find_root()
+    if not argv or argv[0] in ("help", "-h", "--help"):
+        print(USAGE.format(root=root))
+        return 0
+
+    name, rest = argv[0], argv[1:]
+    if name not in COMMANDS:
+        print(f"caliper: unknown command {name!r}\n", file=sys.stderr)
+        print(USAGE.format(root=root), file=sys.stderr)
+        return 2
+
+    selection = argparse.ArgumentParser(add_help=False)
+    selection.add_argument("--scene")
+    selection.add_argument("--set", action="append", default=[], dest="overrides")
+    selected, rest = selection.parse_known_args(rest)
+    try:
+        overrides = json.loads(os.environ.get("CALIPER_CONFIG", "{}"))
+        if not isinstance(overrides, dict):
+            raise ValueError("CALIPER_CONFIG must be a JSON object")
+        for value in selected.overrides:
+            key, separator, raw = value.partition("=")
+            if not separator or not key:
+                raise ValueError("--set expects KEY=JSON, for example hip_span=160")
+            overrides[key] = json.loads(raw)
+    except ValueError as exc:
+        print(f"caliper: {exc}", file=sys.stderr)
+        return 2
+
+    kind, target, _purpose = COMMANDS[name]
+    if name == "export" and (root / "cad/project.json").is_file():
+        kind, target = "tool", "projectcmd.py"
+        rest = ["export", *rest]
+    if kind == "cad":
+        script = root / "cad" / target
+        if not script.exists():
+            print(f"caliper: no {script} — is {root} a workspace?", file=sys.stderr)
+            return 2
+        cmd = [python(), str(script), *rest]
+    elif kind == "node":
+        node = shutil.which("node")
+        if not node:
+            print("caliper: node is not installed, so the physics harness cannot run",
+                  file=sys.stderr)
+            return 2
+        cmd = [node, str(TOOLS / target), *rest]
+    else:
+        cmd = [python(), str(TOOLS / target), *rest]
+
+    env = {**os.environ, "WORKSPACE": str(root), "APP_DIR": str(APP)}
+    if selected.scene:
+        env["CALIPER_SCENE"] = selected.scene
+    env["CALIPER_CONFIG"] = json.dumps(overrides)
+    env.setdefault("RAPIER_PATH", str(APP / "web/vendor/rapier.es.js"))
+    # The shared parts catalogue lives in the image, but it is a workspace's
+    # cad/ that imports it (`from catalog import use`). Putting tools/ on the
+    # child's PYTHONPATH is what reaches it -- and because cad/watch.py spawns
+    # the exporter WITHOUT an env= of its own, it reaches every re-export the
+    # watcher fires too, with nothing to change inside any design.
+    # cad/ stays ahead of it, so a workspace module always wins a name clash.
+    env["PYTHONPATH"] = os.pathsep.join(
+        p for p in (str(root / "cad"), str(TOOLS), os.environ.get("PYTHONPATH")) if p)
+    # cwd is the workspace: the tools write to out/ relative to the root they
+    # were handed, and a traceback should name paths you recognise.
+    return subprocess.run(cmd, cwd=str(root), env=env).returncode
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

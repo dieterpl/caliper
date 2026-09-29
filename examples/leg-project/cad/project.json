@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "default_scene": "assembled",
+  "parameters": {"length": 110, "radius": 10, "side": 1},
+  "scenes": {
+    "assembled": "scenes.leg:assembled",
+    "links_only": "scenes.leg:links_only",
+    "long": {"builder": "scenes.leg:assembled", "config": {"length": 150}}
+  }
+}

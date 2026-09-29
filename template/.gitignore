@@ -1,0 +1,18 @@
+# Everything under out/ is rebuilt from cad/ by `caliper export`, so it is never
+# committed — the model is the source, the artifacts are not.
+out/
+__pycache__/
+*.pyc
+
+# Local credentials and provider session state stay out of design history.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.claude/*
+!.claude/skills/
+.codex/
+.gemini/
+.openai/
+*.log

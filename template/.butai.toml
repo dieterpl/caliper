@@ -1,0 +1,14 @@
+# What butai starts when this workspace opens. The daemon reads this file itself
+# at open time, so nothing outside has to know these processes exist.
+#
+# The watcher is the loop the whole app hangs off: it re-exports out/ ~0.25 s
+# after any save under cad/, and the browser reloads itself when the artifacts
+# change. `ready` is the line that flips the row to "ok" in the UI.
+[[processes]]
+name = "cad"
+cmd = "caliper watch"
+ready = "[watch] watching"
+
+# Agents are deliberately NOT autostarted: restoring eight workspaces after a
+# restart would otherwise launch eight Claude sessions. Start one from the app
+# when you want it.

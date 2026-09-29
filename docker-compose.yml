@@ -1,0 +1,49 @@
+# One container: butai daemon + web app + CAD toolchain + Claude CLI.
+#
+#   docker compose up --build      # http://localhost:8017
+#
+# That is the whole install: the build downloads the butai daemon itself. A .env
+# is optional — every value below has a working default. Copy .env.example when
+# you want to change one (a WEB_TOKEN once the port is exposed, say).
+#
+# Two things are mounted rather than baked in: your ~/.claude (so agents run as
+# you, with no key in the image) and ./workspaces (your designs — the one
+# directory worth backing up).
+services:
+  caliper:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        # Which butai release the image installs. `latest` asks GitHub; pin a
+        # tag (BUTAI_VERSION=v1.1.1 in .env) to build the same image twice.
+        BUTAI_VERSION: ${BUTAI_VERSION:-latest}
+        CLAUDE_CLI_VERSION: ${CLAUDE_CLI_VERSION:-latest}
+        CODEX_CLI_VERSION: ${CODEX_CLI_VERSION:-latest}
+        GEMINI_CLI_VERSION: ${GEMINI_CLI_VERSION:-latest}
+    image: caliper:latest
+    container_name: caliper
+    restart: unless-stopped
+    # Local access by default. LAN access requires BIND_ADDR and WEB_TOKEN.
+    ports:
+      - "${BIND_ADDR:-127.0.0.1}:${PORT:-8017}:8017"
+    volumes:
+      - ./workspaces:/workspaces
+      # The daemon's socket AND its session file live here, so restoring
+      # workspaces across a restart depends on this volume persisting.
+      - caliper-state:/state
+      # Your login, mounted inside the container's HOME (which is on the state
+      # volume). Nested defaults (${A:-${B}/x}) are not valid interpolation
+      # here, so this is one level: override CLAUDE_HOME in .env to move it.
+      - ${CLAUDE_HOME:-~/.claude}:/state/home/.claude
+    environment:
+      WEB_TOKEN: ${WEB_TOKEN:-}
+      GIT_AUTHOR_NAME: ${GIT_AUTHOR_NAME:-caliper}
+      GIT_AUTHOR_EMAIL: ${GIT_AUTHOR_EMAIL:-caliper@localhost}
+      # Claude's own env passes through when set (e.g. a key instead of a login).
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    stop_grace_period: 10s
+
+volumes:
+  caliper-state:

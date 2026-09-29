@@ -1,0 +1,60 @@
+.venv/
+out/
+__pycache__/
+*.pyc
+
+# Your designs. Each workspace is its own git repository, so this tree never
+# belongs to the app's history.
+workspaces/
+
+# An optional local butai binary for the image build, put here by
+# scripts/fetch-butai.sh. Not committed: it is 15 MB, and the build downloads a
+# release when this is absent.
+docker/butai
+
+# Your token and local paths.
+.env
+
+# Pre-workspace design snapshots. Nothing reads this any more; the rule stays so
+# an old one on your disk cannot be committed by accident.
+projects/
+
+# Credentials, provider state and machine-local tooling.
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+.npmrc
+.netrc
+.ssh/
+.aws/
+.azure/
+.kube/
+.gnupg/
+.terraform/
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+.DS_Store
+*.log
+/.claude/
+/.codex/
+/.gemini/
+.openai/
+.idea/
+.vscode/
+.pytest_cache/
+.ruff_cache/
+scratchpad/
+release/
+dashboard/
+# Keep the distributable CAD skill, but exclude provider state at every depth.
+**/.claude/*
+!template/.claude/skills/
+!template/.claude/skills/**
+**/.codex/
+**/.gemini/

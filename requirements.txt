@@ -1,0 +1,10 @@
+build123d
+# trimesh's 3MF exporter walks the scene graph (networkx) and writes the
+# container's XML (lxml). Neither is pulled in by trimesh itself.
+lxml
+networkx
+numpy
+trimesh
+watchdog
+# Security floor for the imaging dependency pulled in by the CAD stack.
+pillow>=12.3.0

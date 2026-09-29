@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "default_scene": "assembled",
+  "parameters": {"length": 110, "hip_span": 130, "hardware": true},
+  "scenes": {
+    "assembled": "scenes.quad:build",
+    "wide": {"builder": "scenes.quad:build", "config": {"hip_span": 180}},
+    "links_only": {"builder": "scenes.quad:build", "config": {"hardware": false}}
+  }
+}

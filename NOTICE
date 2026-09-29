@@ -1,0 +1,40 @@
+caliper
+Copyright 2026 caliper contributors
+
+This product includes software developed as part of the caliper project,
+licensed under the Apache License, Version 2.0 (see LICENSE).
+
+------------------------------------------------------------------------------
+Vendored components
+------------------------------------------------------------------------------
+
+Checked into this repository under web/vendor/ rather than installed:
+
+  Rapier (@dimforge/rapier3d-compat)    web/vendor/rapier.es.js
+  Copyright the Rapier contributors
+  SPDX-License-Identifier: Apache-2.0
+  https://github.com/dimforge/rapier
+
+  This is the wasm-inline build the physics code was written against, pinned
+  here so the viewport and the headless `caliper sim` harness run the same
+  engine. web/vite.config.ts aliases the package name to it.
+
+  butai keyboard protocol helpers                       web/vendor/butai/
+    protocol
+  Copyright the butai contributors
+  SPDX-License-Identifier: MPL-2.0
+  https://github.com/dieterpl/butai
+
+  The client half of butai's framed protocol: the custom elements that paint a
+  live pane, its colour resolution and its message builders. MPL-2.0 is a
+  per-file copyleft — these four files stay under it inside this repository,
+  and a change to any of them has to be published under MPL-2.0 too. The rest
+  of caliper is unaffected by that; Apache-2.0 applies to it as normal.
+
+------------------------------------------------------------------------------
+Installed dependencies
+------------------------------------------------------------------------------
+
+Not vendored here; each carries its own license. Notably three.js (MIT), which
+draws the viewport, and build123d (Apache-2.0), which every design is written
+against. The full sets are in web/package.json and requirements.txt.
