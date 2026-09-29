@@ -4,8 +4,8 @@
 watch it take shape — the render, the drawings, the measurements and the physics
 — in one page in your browser.
 
-![The current caliper workbench: the sample quadruped, model structure on the
-left and a live Butai terminal on the right](docs/images/robot-workbench.png)
+![Caliper workbench displaying a detailed quadruped robot with 192 parts and
+12 joints, alongside its model structure](docs/images/complex-robot-workbench.png)
 
 A design in caliper is a Python program built on [build123d](https://github.com/gumyr/build123d),
 kept in its own git repository. That is the whole idea. Geometry expressed as
@@ -124,20 +124,20 @@ command it dispatches run against any workspace directory without the daemon or
 the container. butai is what turns that toolchain into a multi-design workbench
 with agents in it.
 
-## Example designs
+## Featured example: a quadruped robot
 
-Design ideas illustrated by local workspaces include:
+The opening screenshot shows a detailed quadruped assembly with **192 parts and
+12 joints**. Its model tree groups the chassis, legs, actuators, electronics,
+mounts and fasteners so you can inspect the assembly part by part.
 
-- A robot arm.
-- Quadruped robots and a separate robot-leg assembly.
-- A key holder for an IVAR shelving unit.
-- A lamp.
+This is a demonstration of a design made in caliper. Only the screenshot is
+included here; the robot's workspace source files, Git history, agent
+conversations and generated exports stay local. To start your own design,
+choose **New design**. New workspaces begin with the simpler starter model
+shown in the walkthrough below.
 
-These are examples of what you can create with caliper. Workspace source files,
-Git histories, agent conversations and generated exports stay local under
-`workspaces/`; they are not included in this repository. Create your own design
-from **New design**. The README screenshots show the application and example CAD
-geometry.
+Other design ideas include a robot arm, a standalone robot-leg assembly, a key
+holder for an IVAR shelving unit, or a lamp.
 
 ## Using it
 
