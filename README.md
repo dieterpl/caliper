@@ -130,11 +130,11 @@ The opening screenshot shows a detailed quadruped assembly with **192 parts and
 12 joints**. Its model tree groups the chassis, legs, actuators, electronics,
 mounts and fasteners so you can inspect the assembly part by part.
 
-This is a demonstration of a design made in caliper. Only the screenshot is
+This is a demonstration of a design made in caliper. Only documentation images are
 included here; the robot's workspace source files, Git history, agent
 conversations and generated exports stay local. To start your own design,
-choose **New design**. New workspaces begin with the simpler starter model
-shown in the walkthrough below.
+choose **New design**. New workspaces begin with a simpler starter model; the screenshots below
+use the detailed quadruped demo to show the workbench’s controls.
 
 Other design ideas include a robot arm, a standalone robot-leg assembly, a key
 holder for an IVAR shelving unit, or a lamp.
@@ -143,7 +143,7 @@ holder for an IVAR shelving unit, or a lamp.
 
 The design gallery opens your workspaces, with a preview and Git status for each.
 
-![The design gallery with the exported sample quadruped](docs/images/hub.png)
+![The design gallery with the detailed quadruped demo](docs/images/hub.png)
 
 **New design** asks for a name and a brief — *what should it be?* — and gives
 you a folder and a git repository, with an optional agent terminal. The brief
@@ -161,13 +161,13 @@ From there it is a loop, and the loop is what the design is checked by:
   focused on one part. There is no browser inside the container, so this is how
   an agent *sees*, and it is asked to look before it claims anything.
 
-  ![Four views written by caliper render: front, side, top and an
-  isometric](docs/images/render-robot.png)
+  ![Four views of the detailed quadruped written by caliper render: front, side,
+  top and isometric](docs/images/render-robot.png)
 
   A shaded view cannot show a motor buried in a beam. `caliper render --section
   'y>0'` cuts the design open and puts the cut faces in red:
 
-  ![The same design cut through the middle, the cut faces in
+  ![The detailed quadruped cut through its centre, with exposed interiors in
   red](docs/images/render-section.png)
 - **Measure it.** `caliper fitcheck` finds parts buried in each other, floating
   apart, or mirrored wrong, and says where in millimetres. `caliper rom` says
@@ -177,8 +177,8 @@ From there it is a loop, and the loop is what the design is checked by:
   **Simulate**, with the clock and step counter running in the strip at the bottom.
   Only meaningful once the design has joints.
 
-  ![The sample quadruped running in the physics viewer, with Pause and the
-  simulation clock visible](docs/images/robot-sim.png)
+  ![The detailed quadruped paused in the physics viewer after the first simulation
+  steps, with the clock and step count visible](docs/images/robot-sim.png)
 - **Keep it.** Commit when a change verifies. The app shows the same history and
   can check any commit back out.
 - **Hand it over.** `caliper bundle` writes STEP, STL, 3MF and OBJ into
@@ -205,7 +205,7 @@ Inside a workspace, one command reaches all of it:
 The **Model** panel groups parts as the model declares them. Expand a group
 to inspect individual parts or toggle their visibility:
 
-![The Model panel with the sample quadruped’s frame and leg parts expanded](docs/images/robot-parts.png)
+![The Model panel with the detailed quadruped’s legs and actuators expanded](docs/images/robot-parts.png)
 
 **Joints, motors and physics are optional.** A design that does not move
 declares bodies and stops; the app notices and puts the simulation controls
@@ -225,7 +225,7 @@ controls automatically when `scene.json` has no joints.
 **Files & Git** opens the file tree and version history alongside the model and
 terminal, so you can inspect the source and keep changes in the design’s repository.
 
-![Files and Git beside the sample quadruped and its terminal](docs/images/workspace-files.png)
+![The demo workspace’s file tree and fresh example history beside the detailed quadruped](docs/images/workspace-files.png)
 
 ### Project library
 
@@ -234,16 +234,7 @@ and edit individual subcomponents, compose nested assemblies, configure scenes
 and manage the owning project’s Git changes. Older designs can be adopted while
 keeping their original model as a scene. See [the project guide](docs/SUBPROJECTS.md).
 
-![The project library inspecting the sample quadruped’s chassis](docs/images/workspace-library.png)
-
-### Interactive example
-
-Open [the interactive prototype](http://localhost:8017/#/prototype). Explore Components, Assemblies,
-Scene presets, Files, Changes and demo Butai panes. **Review notes** keeps your
-feedback locally and lets you copy it back into the conversation. Prototype
-geometry and sessions are examples; drafts stay in your browser.
-
-![The interactive redesign prototype with example geometry and demo sessions](docs/images/workspace-prototype.png)
+![The project library inspecting an isolated upper-leg link from the detailed quadruped](docs/images/workspace-library.png)
 
 The real workspace keeps its files, editor and live Butai terminal when opening
 Project library. Scene presets distinguish inspection from **Use in workspace**.
