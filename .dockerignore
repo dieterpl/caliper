@@ -1,5 +1,7 @@
 # Only application inputs enter the build context.
 **
+!LICENSE
+!NOTICE
 !requirements.txt
 !requirements.lock
 !docker/

@@ -12,7 +12,8 @@
 
 # --- build the SPA -----------------------------------------------------------
 FROM node:22-bookworm-slim AS webbuild
-WORKDIR /build
+WORKDIR /build/web
+COPY LICENSE NOTICE /build/
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
@@ -67,10 +68,11 @@ COPY --from=butai /out/butai /usr/local/bin/butai
 
 # The app itself: tools shared by every workspace, the web client, the workspace
 # template, and the one command an agent needs.
+COPY LICENSE NOTICE /opt/caliper/
 COPY tools/ /opt/caliper/tools/
 COPY web/ /opt/caliper/web/
 # The compiled SPA (web/dist) served by web/server.py in production.
-COPY --from=webbuild /build/dist /opt/caliper/web/dist
+COPY --from=webbuild /build/web/dist /opt/caliper/web/dist
 COPY template/ /opt/caliper/template/
 COPY bin/caliper /opt/caliper/bin/caliper
 COPY docker/entrypoint.sh /opt/caliper/entrypoint.sh

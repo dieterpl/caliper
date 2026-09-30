@@ -244,6 +244,14 @@ export default function Hub() {
         {vitals.map((v) => (
           <span key={v}>{v}</span>
         ))}
+        <a
+          href={import.meta.env.DEV ? "https://github.com/dieterpl/caliper/blob/main/NOTICE" : "licenses/NOTICE.txt"}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-auto hover:underline"
+        >
+          Licences & source
+        </a>
       </div>
     </div>
   );

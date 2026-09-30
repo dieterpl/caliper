@@ -1,0 +1,14 @@
+Caliper workspace template
+Copyright 2026 caliper contributors
+
+This workspace was seeded with template code from Caliper:
+https://github.com/dieterpl/caliper
+
+The supplied template code is licensed under the Apache License, Version 2.0
+(see LICENSE). Retain the applicable license and attribution notices when
+redistributing that code or derivatives of it, and identify modified files
+as required by the license.
+
+These notices apply to the Caliper template material. They do not select a
+license for independently authored project content or establish ownership
+of your designs. Other included components retain their own license terms.

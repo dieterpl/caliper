@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath, URL } from "node:url";
+import { licenseNotices } from "./license-notices";
 
 // The Python app (web/server.py) is the real backend in every mode: it proxies
 // the butai daemon, relays /ws, serves artifacts under /w and does token auth.
@@ -16,7 +17,7 @@ const proxy = {
 } as const;
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), licenseNotices()],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

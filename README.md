@@ -372,6 +372,14 @@ and does not create designs or start agents. `OUT` overrides the output director
 
 Apache License 2.0 — see [LICENSE](LICENSE).
 
+The workbench licence does not automatically apply to independent designs
+created with it. New workspaces include Caliper's Apache-2.0 template code
+with its own [licence](template/LICENSE) and [attribution](template/NOTICE).
+Keep those notices when redistributing the copied code or derivatives; they
+do not select a licence for your independently authored project content.
+
 Rapier (Apache-2.0) is vendored under `web/vendor/`, along with the Butai
-keyboard protocol helpers. Everything else is installed, three.js and build123d included.
-Attribution is in [NOTICE](NOTICE).
+keyboard protocol helpers (MPL-2.0). Installed dependencies retain their own
+terms, including the Open CASCADE CAD kernel (LGPL-2.1 with an exception).
+Attribution and distribution notes are in [NOTICE](NOTICE). The Docker image
+includes Caliper's `LICENSE` and `NOTICE` under `/opt/caliper/`.

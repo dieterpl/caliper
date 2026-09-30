@@ -142,9 +142,8 @@ MSG
     exit 1
 fi
 
-# The release signs every asset in one SHA256SUMS file; butai's own updater
-# checks against it and so does this. A release without one (nothing since
-# 1.0.0) is installed with a line saying so, rather than a silent skip.
+# Verify the release checksum before extracting or running the binary.
+# A missing checksum file is a failed download, not permission to skip it.
 if curl -fsSL "$base/SHA256SUMS" -o "$tmp/SHA256SUMS" 2>/dev/null; then
     want="$(awk -v f="$tarball" '$2 == f || $2 == "*" f {print $1}' "$tmp/SHA256SUMS")"
     got="$(sha256sum "$tmp/$tarball" | cut -d' ' -f1)"
@@ -159,7 +158,8 @@ if curl -fsSL "$base/SHA256SUMS" -o "$tmp/SHA256SUMS" 2>/dev/null; then
     fi
     echo "butai: sha256 ok"
 else
-    echo "butai: $VERSION publishes no SHA256SUMS — installing unverified"
+    echo "butai: could not download SHA256SUMS for $VERSION; refusing unverified install" >&2
+    exit 1
 fi
 
 tar -xzf "$tmp/$tarball" -C "$tmp"

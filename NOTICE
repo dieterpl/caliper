@@ -25,16 +25,33 @@ Checked into this repository under web/vendor/ rather than installed:
   SPDX-License-Identifier: MPL-2.0
   https://github.com/dieterpl/butai
 
-  The client half of butai's framed protocol: the custom elements that paint a
-  live pane, its colour resolution and its message builders. MPL-2.0 is a
-  per-file copyleft — these four files stay under it inside this repository,
-  and a change to any of them has to be published under MPL-2.0 too. The rest
-  of caliper is unaffected by that; Apache-2.0 applies to it as normal.
+  protocol.js contains message builders and keyboard mapping. This file
+  remains under MPL-2.0; its license text is in web/vendor/butai/LICENSE.
+  When distributing it, including in a compiled bundle, make the covered
+  source and any modifications available to recipients under MPL-2.0 and
+  tell them where to obtain it. Private modifications do not by themselves
+  require publication. Caliper's own code remains under Apache-2.0.
 
 ------------------------------------------------------------------------------
 Installed dependencies
 ------------------------------------------------------------------------------
 
-Not vendored here; each carries its own license. Notably three.js (MIT), which
-draws the viewport, and build123d (Apache-2.0), which every design is written
-against. The full sets are in web/package.json and requirements.txt.
+web/vendor/react-remove-scroll-bar/LICENSE preserves the upstream MIT notice
+omitted from the react-remove-scroll-bar 2.3.8 npm tarball. It was copied from:
+https://github.com/theKashey/react-remove-scroll-bar/blob/7301c160fda44cb8cf2b9fdfde61efad35736196/LICENSE
+
+The frontend build emits licenses/NOTICE.txt with the installed frontend
+packages' license notices, the Apache and MPL license texts, and the exact
+Butai protocol helper source. These are linked from the design gallery.
+
+Each installed dependency retains its own license. Notably three.js (MIT)
+draws the viewport and build123d (Apache-2.0) provides the CAD API. Its CAD
+kernel, Open CASCADE Technology, is LGPL-2.1 with the Open CASCADE exception:
+https://dev.opencascade.org/doc/overview/html/occt_public_license.html
+
+The dependency manifests are web/package.json and requirements.txt; the
+resolved versions are in web/package-lock.json and requirements.lock.
+Docker also installs the Butai daemon, agent CLIs and operating-system
+packages. Caliper's Apache-2.0 license does not replace their terms. A
+distributor of a built image must retain the applicable notices and satisfy
+each component's source-availability and redistribution requirements.
