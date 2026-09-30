@@ -340,9 +340,8 @@ smoke test.
 
 ## Security and release checks
 
-See [SECURITY.md](SECURITY.md) for the trust model and deployment guidance, and
-[the release audit](docs/RELEASE_AUDIT.md) for the privacy cleanup and history
-limitations. CI runs the frontend build, Python tests, dependency audits and
+See [SECURITY.md](SECURITY.md) for the trust model and deployment guidance.
+CI runs the frontend build, Python tests, dependency audits and
 secret scans, including privacy checks across Git history. Run
 `python3 scripts/check-release.py --history` after fetching all branches.
 For local Python testing, use Python 3.11 and install the checked

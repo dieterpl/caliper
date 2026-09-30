@@ -38,5 +38,5 @@ tests and dependency audits. Review screenshots as well as source files.
 
 Keep GitHub secret scanning and push protection enabled where available.
 A clean current tree does not remove private data from previous commits,
-branches, tags, pull requests or existing clones. See
-[the release audit](docs/RELEASE_AUDIT.md) before publishing historical refs.
+branches, tags, pull requests or existing clones. Review historical refs before
+publishing them.
