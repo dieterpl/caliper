@@ -7,4 +7,4 @@ numpy
 trimesh
 watchdog
 # Security floor for the imaging dependency pulled in by the CAD stack.
-pillow>=12.3.0
+pillow>=13.0.0
